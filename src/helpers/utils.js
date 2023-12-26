@@ -9,7 +9,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 // import 'dotenv/config';
 import passport from "passport";
-import UserManager from "../dao/UserManager.js";
+// import UserManager from "../dao/UserManager.js";
+import UsersService from "../services/users.services.js";
 
 import config from "../config.js";
 
@@ -149,7 +150,8 @@ export const jwtAuth = (req, res, next) => {
         if (error) {
             return res.status(403).json({ message: 'no authorized' })
         }
-        req.user = await UserManager.getById(payload.id)
+        req.user = await UsersService.findById(payload.id)
+        // req.user = await UserManager.getById(payload.id)
         next();
     })
 }
@@ -165,4 +167,17 @@ export const authMiddleware = (strategy) => (req, res, next) => { // funcion que
         req.user = user;
         next();
     })(req, res, next) // la respuesta de la funcion authenticate no es mas que el middleware ara la siguiente
+}
+
+export const authorizationMiddleware = (roles) => (req, res, next) => {
+    // console.log("req.user", req.user)
+    if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { rol: userRole } = req.user;
+    if (!roles.includes(userRole)) {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+    next();
 }

@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+const roles = ['user', 'admin'];
+
 const userSchema = new mongoose.Schema({
     first_name: String,
     last_name: String,
@@ -7,16 +9,10 @@ const userSchema = new mongoose.Schema({
     age: Number,
     password: String,
     cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
-    rol: { type: String, default: "user" },
+    rol: { type: String, enumr: roles, default: "user" },
     provider: String,
 
 }, { timestamps: true });
-
-// cartSchema.pre('find', function () {
-//     this.populate('products.productId')
-// }).pre('findOne', function () {
-//     this.populate('products.productId')
-// })
 
 userSchema.pre('find', function () {
     this.populate('cart.products.productId')

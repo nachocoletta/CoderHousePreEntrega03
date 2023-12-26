@@ -12,7 +12,7 @@ export default class AuthController {
         } = data
 
         let user = await UsersService.findAll({ email })
-        if (user) {
+        if (user.length > 0) {
             throw new Error("Usuario ya registrado")
         }
         user = await UsersService.create({

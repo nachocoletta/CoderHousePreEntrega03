@@ -15,59 +15,61 @@ const router = Router();
 
 
 // aca va auth adelante de cada ruta
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+router.post('/login',
+    async (req, res) => {
+        const { email, password } = req.body;
 
-    console.log('entrando a login ahora con jwt')
-    try {
-        // const user = await UsersController.getByMail(email)
-        const user = await UsersController.get({ email })
-        // console.log(user);
+        console.log('entrando a login ahora con jwt')
+        try {
+            // const user = await UsersController.getByMail(email)
+            const user = await UsersController.get({ email })
+            // console.log(user);
 
 
-        if (!user) {
-            return res.status(401).json({ message: "Correo o password invalidos" })
+            if (!user) {
+                return res.status(401).json({ message: "Correo o password invalidos" })
+            }
+            const isPassValid = isValidPassword(password, user[0])
+            if (!isPassValid) {
+                return res.status(401).json({ message: "Correo o password invalidos" })
+            }
+
+            const token = tokenGenerator(user[0]);
+            // console.log('paso por aca')
+            // res.status(200).json({ access_token: token })
+            res
+                .cookie('access_token',
+                    token,
+                    { maxAge: 3600000, httpOnly: true })
+                .status(200)
+                // .json({ status: 'success' })
+                .redirect('/products')
+        } catch (error) {
+            console.log(`Error ${error.message}`);
+            return res.status(500).json({ error: error.message })
         }
-        const isPassValid = isValidPassword(password, user[0])
-        if (!isPassValid) {
-            return res.status(401).json({ message: "Correo o password invalidos" })
+    })
+
+router.post('/register',
+    async (req, res, next) => {
+
+        try {
+            console.log('entra')
+            const { body } = req;
+
+            // console.log("body", body)
+            const newUser = await AuthController.register({
+                ...body,
+                password: createHash(req.body.password)
+            });
+
+            // console.log('newUser', newUser);
+            return res.status(200).json({ status: 'success', message: 'User registered successfully' });
+        } catch (error) {
+            console.log(error.message)
+            next(error)
         }
-
-        const token = tokenGenerator(user[0]);
-        // console.log('paso por aca')
-        // res.status(200).json({ access_token: token })
-        res
-            .cookie('access_token',
-                token,
-                { maxAge: 3600000, httpOnly: true })
-            .status(200)
-            // .json({ status: 'success' })
-            .redirect('/products')
-    } catch (error) {
-        console.log(`Error ${error.message}`);
-        return res.status(500).json({ error: error.message })
-    }
-})
-
-router.post('/register', async (req, res, next) => {
-
-    try {
-        // console.log('entra')
-        const { body } = req;
-
-        // console.log("body", body)
-        const newUser = await AuthController.register({
-            ...body,
-            password: createHash(req.body.password)
-        });
-
-        // console.log('newUser', newUser);
-        return res.status(200).json({ status: 'success', message: 'User registered successfully' });
-    } catch (error) {
-        console.log(error.message)
-        next(error)
-    }
-});
+    });
 
 router.get('/current',
     // jwtAuth,

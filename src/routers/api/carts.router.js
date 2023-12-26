@@ -1,7 +1,7 @@
 import { Router } from "express";
 import CartManager from "../../dao/CartManager.js";
 import CartController from "../../controllers/cart.controller.js"
-
+import { authorizationMiddleware } from "../../helpers/utils.js";
 const router = Router();
 
 router.get('/', async (req, res) => {
@@ -29,17 +29,18 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/:cartId', async (req, res) => {
-    try {
-        const { cartId } = req.params
-        const { productId, quantity } = req.body;
-        const product = await CartController.addProductToCart(cartId, productId, quantity)
-        res.status(201).json(product)
-    } catch (error) {
-        console.error(error.message)
-        res.status(error.statusCode || 500).json({ message: error.message })
-    }
-})
+router.post('/:cartId',
+    async (req, res) => {
+        try {
+            const { cartId } = req.params
+            const { productId, quantity } = req.body;
+            const product = await CartController.addProductToCart(cartId, productId, quantity)
+            res.status(201).json(product)
+        } catch (error) {
+            console.error(error.message)
+            res.status(error.statusCode || 500).json({ message: error.message })
+        }
+    })
 
 // router.delete('/:cartId', async (req, res) => {
 //     const { cartId } = req.params;

@@ -6,6 +6,7 @@ import { uploader } from "../../helpers/utils.js";
 import passport from "passport";
 import config from "../../config.js";
 import ProductsController from "../../controllers/products.controller.js";
+import { authorizationMiddleware } from "../../helpers/utils.js";
 
 const router = Router();
 
@@ -27,6 +28,7 @@ const buildResponse = (data) => {
 
 router.get('/',
     passport.authenticate('jwt', { session: false }),
+    authorizationMiddleware(['user', 'admin']),
     async (req, res, next) => {
         try {
             const { page = 1, limit = 10, category, sort } = req.query;
@@ -72,6 +74,8 @@ router.get('/:pid',
 
 
 router.post('/',
+    passport.authenticate('jwt', { session: false }),
+    authorizationMiddleware('admin'),
     uploader.array('thumbnails', 4),
     async (req, res) => {
         const { body } = req;
@@ -100,6 +104,8 @@ router.post('/',
 // })
 
 router.put('/:pid',
+    passport.authenticate('jwt', { session: false }),
+    authorizationMiddleware('admin'),
     async (req, res) => {
         const { pid } = req.params;
         const { body } = req
@@ -112,6 +118,8 @@ router.put('/:pid',
     })
 
 router.delete('/:pid',
+    passport.authenticate('jwt', { session: false }),
+    authorizationMiddleware('admin'),
     async (req, res) => {
         try {
             const { pid } = req.params;
