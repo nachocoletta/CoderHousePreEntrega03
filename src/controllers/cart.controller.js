@@ -1,5 +1,7 @@
 import CartsService from "../services/carts.services.js";
 import { Exception } from "../helpers/utils.js";
+import UsersService from "../services/users.services.js";
+import ProductsController from "./products.controller.js";
 export default class CartController {
 
     static async get(filter = {}) {
@@ -155,4 +157,31 @@ export default class CartController {
         }
     }
 
+    static async createPurchase(cid) {
+
+        const user = await UsersService.findAll({ cartId: cid })
+
+        if (user.length > 0) {
+            let cart = await CartsService.findById({ _id: user[0].cartId })
+
+            let productsWithoutStock = [];
+            let updatedProducts;
+            cart.products.map(async (prod) => {
+                if (prod.productId.stock < prod.quantity) {
+                    console.log('Stock insuficiente');
+                    productsWithoutStock.push(prod.productId._id)
+                } else {
+                    console.log('Hay stock')
+                    updatedProducts = await ProductsController.updateById(prod.productId._id,
+                        {
+                            stock: prod.productId.stock - prod.quantity
+                        }
+                    )
+                }
+            })
+            return { user, productsWithoutStock }
+        }
+
+
+    }
 }

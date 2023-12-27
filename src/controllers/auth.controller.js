@@ -1,4 +1,5 @@
 import { createHash, isValidPassword, tokenGenerator } from "../helpers/utils.js";
+import CartsService from "../services/carts.services.js";
 import UsersService from "../services/users.services.js";
 import UsersController from "./users.controller.js";
 
@@ -15,24 +16,26 @@ export default class AuthController {
         if (user.length > 0) {
             throw new Error("Usuario ya registrado")
         }
+        const cart = await CartsService.create()
         user = await UsersService.create({
             first_name,
             last_name,
             email,
-            password: createHash(password)
+            password, //: createHash(password),
+            cartId: cart._id
         })
 
-        const token = tokenGenerator(user)
         // console.log(user)
+        const token = tokenGenerator(user)
 
         return token;
     }
     static async login(data) {
-        // const user = await UsersService.f
+
         const { email, password } = data
         const user = await UsersService.findAll({ email });
         // console.log("user", user)
-        if (!user) {
+        if (user.length === 0) {
             throw new Error("Correo o contraseña invalidos")
         }
         const validPassword = isValidPassword(password, user);

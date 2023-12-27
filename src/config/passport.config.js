@@ -91,7 +91,7 @@ export const init = () => {
     passport.use('jwt', new JWTStrategy(
         JWTOptions,
         async (payload, done) => {
-            console.log("payload", payload);
+            // console.log("payload", payload);
             const user = await UsersController.getById(payload.id)
             return done(null, user)
         }))

@@ -20,7 +20,7 @@ router.post('/auth/login', async (req, res) => {
     const token = tokenGenerator(user);
 
     res.cookie('access_token', token, {
-        maxAge: 60000,
+        maxAge: 1000 * 60 * 60,
         httpOnly: true,
         signed: true
     })
@@ -29,7 +29,9 @@ router.post('/auth/login', async (req, res) => {
         .redirect('/product');
 })
 
-router.get('/current', authMiddleware('jwt'), (req, res) => {
-    res.status(200).json(req.user)
-})
+router.get('/current',
+    authMiddleware('jwt'),
+    (req, res) => {
+        res.status(200).json(req.user)
+    })
 export default router;

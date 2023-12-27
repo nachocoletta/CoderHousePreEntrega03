@@ -8,16 +8,16 @@ const userSchema = new mongoose.Schema({
     email: { type: String, unique: true },
     age: Number,
     password: String,
-    cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
+    cartId: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
     rol: { type: String, enumr: roles, default: "user" },
     provider: String,
 
 }, { timestamps: true });
 
-userSchema.pre('find', function () {
-    this.populate('cart.products.productId')
-}).pre('findOne', function () {
-    this.populate('cart.products.productId')
-});
+// userSchema.pre('find', function () {
+//     this.populate('cart.products.productId')
+// }).pre('findOne', function () {
+//     this.populate('cart.products.productId')
+// });
 
 export default mongoose.model('User', userSchema);

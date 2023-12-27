@@ -7,8 +7,8 @@ export default class ProductsService {
     }
 
     static async create(payload) {
-        console.log(('creando producto'));
-        console.log("payload en service", payload);
+        console.log('creando producto');
+        // console.log("payload en service", payload);
         const product = await ProductDao.create(payload);
         console.log(`Producto creado correctamente (${product._id})`)
         return product;

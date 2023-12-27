@@ -1,23 +1,65 @@
 (function () {
     // let username;
 
+
     const socket = io();
 
 
     const buttonsAddProductToCart = document.getElementsByClassName("boton")
     const arrayOfButtons = Array.from(buttonsAddProductToCart)
     arrayOfButtons.forEach(element => {
-        element.addEventListener('click', (event) => {
+        element.addEventListener('click', async (event) => {
             event.preventDefault();
             // console.log(`Click en el boton con id ${element.id}`);
-            let valor = document.getElementById(`${element.id}`).value
+            // alert(element.id)
+            // let valor = document.getElementById(`${element.id}`).value
+            // alert(valor)
+            let product = {};
+            let cantidad = document.getElementById(`${element.id}`).value
+            let row = element.closest('tr');
+
+            // Accede al elemento de la columna que contiene el stock
+            let stockElement = row.querySelector('td:nth-child(6)'); // Ajusta el índice según la posición de la columna
+
+            // Obtiene el valor del stock desde el contenido del elemento
+            let stockValue = stockElement.textContent.trim();
+
+
+            // console.log("cantidad", cantidad)
+            try {
+                const response = await fetch('http://localhost:8080/auth/current')
+
+                // console.log("response", response)
+                if (response.ok) {
+                    const data = await response.json();
+
+                    product = {
+                        cartId: data.cartId,
+                        _id: element.id,
+                        quantity: cantidad
+                    }
+                    // console.log("product", product)
+
+                }
+            } catch (error) {
+                console.error("Error", error.message)
+            }
+
             // console.log("valor", valor)
-            const product = {
-                cartId: valor,
-                _id: element.id,
-                quantity: 1
+            // const product = {
+            //     cartId: valor,
+            //     _id: element.id,
+            //     quantity: 1
+            // }
+
+            if (cantidad <= stockValue) {
+                // console.log(cantidad + ' ' + stockValue)
+                alert("Producto agregado al carrito")
+            } else {
+                alert("Stock insuficiente - Producto agregado al carrito igualmente")
             }
             socket.emit('addProductToCart', product);
+            document.getElementById(`${element.id}`).value = ""
         })
     }
     )
@@ -155,7 +197,7 @@
     }))
 
     socket.on('listCarts', (carts) => {
-        console.log('entra');
+        // console.log('entra');
         const container = document.getElementById('carts');
         container.innerHTML = "";
 
@@ -181,23 +223,57 @@
         container.appendChild(document.createElement('hr'));
     });
 
-
-    formAddProductToCart?.addEventListener('submit', (event => {
+    formAddProductToCart.addEventListener('submit', async (event) => {
         event.preventDefault();
+        // alert('hola')
+        // const product = {
+        //     cartId: document.getElementById('cart-input-id-product-to-cart').value,
+        //     _id: document.getElementById('input-id-product-to-cart').value,
+        //     quantity: document.getElementById('input-quantity-product-in-cart').value
+        // }
 
-        const product = {
-            cartId: document.getElementById('cart-input-id-product-to-cart').value,
-            _id: document.getElementById('input-id-product-to-cart').value,
-            quantity: document.getElementById('input-quantity-product-in-cart').value
+        try {
+            const response = await fetch('http://localhost:8080/auth/current')
+
+            if (response.ok) {
+                const data = await response.json();
+
+                const product = {
+                    cartId: data.cartId,
+                    _id: document.getElementById('input-id-product-to-cart').value,
+                    quantity: document.getElementById('input-quantity-product-in-cart').value
+                }
+                console.log('product', product)
+
+                socket.emit('addProductToCart', product);
+
+                document.getElementById('cart-input-id-product-to-cart').value = ""
+                document.getElementById('input-id-product-to-cart').value = ""
+                document.getElementById('input-quantity-product-in-cart').value = ""
+
+            }
+        } catch (error) {
+            console.error("Error", error.message)
         }
+        console.log(product);
+    })
 
-        socket.emit('addProductToCart', product);
+    // formAddProductToCart?.addEventListener('submit', (event => {
+    //     event.preventDefault();
 
-        document.getElementById('cart-input-id-product-to-cart').value = ""
-        document.getElementById('input-id-product-to-cart').value = ""
-        document.getElementById('input-quantity-product-in-cart').value = ""
+    //     const product = {
+    //         cartId: document.getElementById('cart-input-id-product-to-cart').value,
+    //         _id: document.getElementById('input-id-product-to-cart').value,
+    //         quantity: document.getElementById('input-quantity-product-in-cart').value
+    //     }
 
-    }))
+    //     socket.emit('addProductToCart', product);
+
+    //     document.getElementById('cart-input-id-product-to-cart').value = ""
+    //     document.getElementById('input-id-product-to-cart').value = ""
+    //     document.getElementById('input-quantity-product-in-cart').value = ""
+
+    // }))
 
     formRemoveCart?.addEventListener('submit', (event => {
         event.preventDefault();
@@ -207,4 +283,8 @@
         socket.emit('deleteCart', cartId);
         document.getElementById('cart-input-id-product-to-remove').value = ''
     }))
+
+    Handlebars.registerHelper('JSONstringify', function (context) {
+        return JSON.stringify(context);
+    });
 })();

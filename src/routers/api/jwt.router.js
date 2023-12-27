@@ -16,21 +16,25 @@ const router = Router();
 
 // aca va auth adelante de cada ruta
 router.post('/login',
-    async (req, res) => {
+    async (req, res, next) => {
         const { email, password } = req.body;
 
         console.log('entrando a login ahora con jwt')
+        // console.log(email)
+        // console.log(password)
         try {
             // const user = await UsersController.getByMail(email)
             const user = await UsersController.get({ email })
             // console.log(user);
 
 
-            if (!user) {
+            if (user.length === 0) {
+                // console.log('1')
                 return res.status(401).json({ message: "Correo o password invalidos" })
             }
             const isPassValid = isValidPassword(password, user[0])
             if (!isPassValid) {
+                // console.log('2')
                 return res.status(401).json({ message: "Correo o password invalidos" })
             }
 
@@ -40,13 +44,14 @@ router.post('/login',
             res
                 .cookie('access_token',
                     token,
-                    { maxAge: 3600000, httpOnly: true })
+                    { maxAge: 1000 * 60 * 60, httpOnly: true })
                 .status(200)
                 // .json({ status: 'success' })
                 .redirect('/products')
         } catch (error) {
             console.log(`Error ${error.message}`);
-            return res.status(500).json({ error: error.message })
+            next(error)
+            // return res.status(500).json({ error: error.message })
         }
     })
 
@@ -54,7 +59,7 @@ router.post('/register',
     async (req, res, next) => {
 
         try {
-            console.log('entra')
+            // console.log('entra')
             const { body } = req;
 
             // console.log("body", body)

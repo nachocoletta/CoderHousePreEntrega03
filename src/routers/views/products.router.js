@@ -24,7 +24,7 @@ const buildResponse = (data, req) => {
         return {
             title: "Products",
             status: "success",
-            // user: req.session.user,
+            user: req.user,
             payload: data.docs.map(product => product.toJSON()),
             totalPages: data.totalPages,
             prevPage: data.prevPage,
@@ -39,7 +39,7 @@ const buildResponse = (data, req) => {
     return {
         title: "Products",
         status: "success",
-        // user: req.session.user,
+        user: req.user,
         payload: data.docs.map(product => product.toJSON()),
         totalPages: data.totalPages,
         prevPage: data.prevPage,
@@ -99,8 +99,13 @@ router.get('/',
             }
 
             const result = await ProductController.get(criteria, options)
-
-            res.render('products', buildResponse(result, req))
+            // console.log("build", buildResponse(result, req))
+            const response = buildResponse(result, req)
+            response.user = req.user;
+            response.user = response.user.toJSON();
+            console.log("response", response)
+            res.render('products', response);
+            // res.render('products', buildResponse(result, req))
 
         } catch (error) {
             res.status(500).json({ error: error.message })
