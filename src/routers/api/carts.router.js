@@ -30,7 +30,7 @@ router.post('/:cartId',
 
     async (req, res) => {
         try {
-            console.log("req.user", req.user)
+            // console.log("req.user", req.user)
             const { cartId } = req.params
             const { productId, quantity } = req.body;
             const product = await CartController.addProductToCart(cartId, productId, quantity)
@@ -126,13 +126,15 @@ router.post('/:cid/purchase',
         const { cid } = req.params;
 
         try {
-            const { user, productsWithoutStock } = await CartController.createPurchase(cid)
+            const { user, productsWithoutStock, cart, ticket } = await CartController.createPurchase(cid)
 
 
             // console.log("updatedProducts", updatedProducts)
             res.status(200).json({
                 user,
-                productsWithoutStock
+                productsWithoutStock,
+                cart,
+                ticket
             })
         } catch (error) {
             console.error("Error", error.message);

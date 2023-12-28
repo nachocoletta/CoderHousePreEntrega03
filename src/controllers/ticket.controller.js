@@ -2,12 +2,13 @@ import TicketsService from "../services/tickets.services.js";
 
 export default class TicketController {
     static async get(filter, options) {
-        const tickets = await TicketsService.findAll(filter, option)
+        const tickets = await TicketsService.findAll(filter, options)
         return tickets
     }
 
-    static async create(data) {
-
+    static async create(data = {}) {
+        const ticket = await TicketsService.create(data)
+        return ticket;
     }
 
     static async getById(tid) {

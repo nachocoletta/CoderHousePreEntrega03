@@ -2,6 +2,8 @@ import CartsService from "../services/carts.services.js";
 import { Exception } from "../helpers/utils.js";
 import UsersService from "../services/users.services.js";
 import ProductsController from "./products.controller.js";
+import TicketController from "./ticket.controller.js";
+import { getNewId } from "../helpers/utils.js";
 export default class CartController {
 
     static async get(filter = {}) {
@@ -73,7 +75,7 @@ export default class CartController {
 
 
             if (existingProductIndex !== -1) {
-                console.log("existingProduct", existingProductIndex);
+                // console.log("existingProduct", existingProductIndex);
                 cart.products.splice(existingProductIndex, 1)
             } else {
                 throw new Exception('No se encontro el producto en el carrito', 404)
@@ -160,26 +162,40 @@ export default class CartController {
     static async createPurchase(cid) {
 
         const user = await UsersService.findAll({ cartId: cid })
-
+        let amount = 0;
         if (user.length > 0) {
             let cart = await CartsService.findById({ _id: user[0].cartId })
 
             let productsWithoutStock = [];
+            let productsWithStock = [];
+
             let updatedProducts;
-            cart.products.map(async (prod) => {
+            await Promise.all(cart.products.map(async (prod) => {
                 if (prod.productId.stock < prod.quantity) {
                     console.log('Stock insuficiente');
-                    productsWithoutStock.push(prod.productId._id)
+                    productsWithoutStock.push({ _id: prod.productId._id, quantity: prod.quantity })
                 } else {
                     console.log('Hay stock')
+                    productsWithStock.push({ _id: prod.productId._id, quantity: prod.quantity })
                     updatedProducts = await ProductsController.updateById(prod.productId._id,
                         {
                             stock: prod.productId.stock - prod.quantity
                         }
                     )
+                    console.log(`price ${prod.productId.price} * ${prod.quantity}`);
+                    amount += prod.productId.price * prod.quantity
+                    console.log('amount', amount)
+                    cart = await CartController.removeProductFromCart(cid, prod.productId._id)
                 }
+            }))
+            // console.log('amount', amount)
+            const ticket = await TicketController.create({
+                code: getNewId(),
+                purchase_datetime: Date.now(),
+                amount,
+                purchaser: user[0].email
             })
-            return { user, productsWithoutStock }
+            return { user, productsWithoutStock, cart, ticket }
         }
 
 
