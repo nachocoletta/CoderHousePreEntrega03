@@ -1,8 +1,9 @@
-import dotenv from 'dotenv'
+// import dotenv from 'dotenv'
 
-dotenv.config();
+// dotenv.config();
 
 export default {
+    persistence: process.env.PERSISTENCE,
     port: process.env.SERVER_PORT || 8080,
     db: {
         mongodbURL: process.env.DB_MONGO_ATLAS
