@@ -31,6 +31,7 @@ router.post('/:cartId',
     async (req, res) => {
         try {
             // console.log("req.user", req.user)
+            // console.log('addproducttocart')
             const { cartId } = req.params
             const { productId, quantity } = req.body;
             const product = await CartController.addProductToCart(cartId, productId, quantity)

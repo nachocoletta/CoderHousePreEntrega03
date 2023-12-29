@@ -31,6 +31,7 @@ export default class CartController {
     static async addProductToCart(cartId, productId, quantity) {
         try {
             // console.log('entra al controlador');
+            // console.log("cartId", cartId)
             const cart = await CartController.getById(cartId)
             // console.log("quantity", quantity)
             // const cart = await CartModel.findById(cartId);

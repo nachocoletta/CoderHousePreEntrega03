@@ -5,6 +5,20 @@
     const socket = io();
 
 
+    // const socket = io('http://localhost:8080', {
+    //     transportOptions: {
+    //         polling: {
+    //             extraHeaders: {
+    //                 Authorization: `Bearer ${access_token}`
+    //             }
+    //         }
+    //     }
+    // });
+
+
+
+
+    // console.log("socket", socket)
     const buttonsAddProductToCart = document.getElementsByClassName("boton")
     const arrayOfButtons = Array.from(buttonsAddProductToCart)
     arrayOfButtons.forEach(element => {
@@ -215,6 +229,17 @@
                 cartElement.appendChild(productElement);
             });
 
+            const buyButton = document.createElement('button');
+            buyButton.innerText = 'Comprar';
+            buyButton.addEventListener('click', () => {
+                // Lógica para procesar la compra del carrito
+                // Puedes llamar a una función o emitir un evento al servidor aquí
+                socket.emit('cartPurchase', cart._id)
+                alert("Ticket generado, en el cart quedaron los productos sin stock suficente")
+                console.log(`Comprar carrito ${cart._id}`);
+            });
+
+            cartElement.appendChild(buyButton);
             const hr = document.createElement('hr');
             container.appendChild(cartElement);
             container.appendChild(hr);
@@ -233,7 +258,7 @@
         // }
 
         try {
-            const response = await fetch('http://localhost:8080/auth/current')
+            const response = await fetch('http://localhost:8080/auth/cart')
 
             if (response.ok) {
                 const data = await response.json();
@@ -287,4 +312,10 @@
     Handlebars.registerHelper('JSONstringify', function (context) {
         return JSON.stringify(context);
     });
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
 })();

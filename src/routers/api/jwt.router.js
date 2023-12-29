@@ -3,6 +3,7 @@ import { Router } from 'express';
 // import UserManager from '../../dao/UserManager.js';
 import UsersController from '../../controllers/users.controller.js';
 import AuthController from '../../controllers/auth.controller.js';
+import { userRepository } from '../../repositories/index.js';
 
 import {
     createHash, isValidPassword,
@@ -82,10 +83,45 @@ router.get('/current',
     async (req, res) => {
         // console.log(req.user);
         try {
+            // console.log("entra a estrategia current")
             // console.log("req.user", req.user)
-            res.status(200).json(req.user)
+
+            const user = await userRepository.getCurrent(req.user.id)
+
+            res.status(200).json(user)
+            // console.log("user", user)
+            // res.status(200).json(req.user)
         } catch (error) {
             return res.status(500).json({ error: error.message })
+        }
+    })
+
+router.get('/cart',
+    // jwtAuth,
+    authMiddleware('jwt'), // aca le mando la estrategia que quiero usar, en este caso jwt
+    async (req, res) => {
+        // console.log(req.user);
+        try {
+            console.log("entra a estrategia current")
+            console.log("req.user", req.user)
+
+            // const user = await userRepository.getCurrent(req.user.id)
+
+            res.status(200).json(req.user)
+            // console.log("user", user)
+            // res.status(200).json(req.user)
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    })
+router.get('/users',
+    async (req, res, next) => {
+        try {
+            const users = await UsersController.get();
+            res.status(200).json(users)
+        } catch (error) {
+            console.error("Error", error.message)
+            next(error)
         }
     })
 
@@ -121,4 +157,6 @@ router.post('/password-recovery',
 //     // console.log('newUser', newUser);
 //     res.status(200).json(req.body)
 // });
+
+
 export default router;

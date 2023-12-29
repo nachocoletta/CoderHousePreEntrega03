@@ -101,9 +101,12 @@ router.get('/',
             const result = await ProductController.get(criteria, options)
             // console.log("build", buildResponse(result, req))
             const response = buildResponse(result, req)
+            // console.log("req.user", req.user)
             response.user = req.user;
-            response.user = response.user.toJSON();
-            console.log("response", response)
+            response.user.first_name = req.user.firstName
+            response.user.last_name = req.user.lastName
+            // response.user = response.user.toJSON();
+            // console.log("response", response.user)
             res.render('products', response);
             // res.render('products', buildResponse(result, req))
 
