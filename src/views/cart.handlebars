@@ -23,5 +23,22 @@
         <td>{{this.quantity}}</td>
     </tr>
     {{/each}}
+
 </table>
+<div style="display: flex; flex-direction: row; justify-content: space-between;">
+    <!-- Columna 1 -->
+    <div style="flex: 1;">
+        <button type="submit" value="{{this.cartId}}" id="comprarBtn">Comprar</button>
+    </div>
+    <div style="flex: 1;">
+        <button type="button" id="volverBtn">Volver</button>
+    </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
 <script src="/js/cart.js"></script>
+{{!-- <script src="/js/index.js"></script> --}}
+<script>
+    document.getElementById('volverBtn').addEventListener('click', function() {
+        window.history.back();
+    });
+</script>

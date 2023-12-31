@@ -119,14 +119,14 @@
         document.getElementById('input-category').value = '';
     }))
 
-    formDeleteProduct.addEventListener('submit', (event) => {
+    formDeleteProduct?.addEventListener('submit', (event) => {
         event.preventDefault();
         const idProduct = document.getElementById('input-id-product').value;
         socket.emit('deleteProduct', idProduct)
         document.getElementById('input-id-product').value = '';
     })
 
-    formUpdateProduct.addEventListener('submit', (event) => {
+    formUpdateProduct?.addEventListener('submit', (event) => {
         event.preventDefault();
         const productToBeUpdated = {
             _id: document.getElementById('input-id-product-update').value,
@@ -208,6 +208,7 @@
     const formAddProductToCart = document.getElementById('add-product-to-cart')
     const formRemoveCart = document.getElementById('remove-cart');
 
+
     formCreateCart?.addEventListener('submit', (event => {
         event.preventDefault();
         // let newCart = {}
@@ -243,6 +244,15 @@
                 console.log(`Comprar carrito ${cart._id}`);
             });
 
+            const seeCart = document.createElement('button');
+            seeCart.innerText = 'Ver Carrito';
+
+            seeCart.addEventListener('click', () => {
+                const cartId = cart._id;
+                // Redireccionar al usuario a la URL deseada
+                window.location.href = `http://localhost:8080/cart/${cartId}`;
+            });
+            cartElement.appendChild(seeCart);
             cartElement.appendChild(buyButton);
             const hr = document.createElement('hr');
             container.appendChild(cartElement);
@@ -252,7 +262,7 @@
         container.appendChild(document.createElement('hr'));
     });
 
-    formAddProductToCart.addEventListener('submit', async (event) => {
+    formAddProductToCart?.addEventListener('submit', async (event) => {
         event.preventDefault();
         // alert('hola')
         // const product = {
@@ -312,6 +322,14 @@
         socket.emit('deleteCart', cartId);
         document.getElementById('cart-input-id-product-to-remove').value = ''
     }))
+
+
+    // const buttonPurchaseOnCart = document.getElementById('comprarBtn')
+
+    // buttonPurchaseOnCart?.addEventListener('click', ((event) => {
+    //     event.preventDefault()
+    //     alert(cart._id)
+    // }))
 
     Handlebars.registerHelper('JSONstringify', function (context) {
         return JSON.stringify(context);

@@ -15,7 +15,8 @@ export default class CartDao {
     }
 
     static async updateById(cid, products) {
-        return await CartModel.findOneAndUpdate({ _id: cid }, { $set: { products } })
+        return await CartModel.findOneAndUpdate({ _id: cid }, { $set: { products } }, { new: true });
+
     }
 
 
