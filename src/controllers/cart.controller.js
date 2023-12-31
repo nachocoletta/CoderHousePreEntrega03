@@ -32,6 +32,11 @@ export default class CartController {
         try {
             // console.log('entra al controlador');
             // console.log("cartId", cartId)
+            const user = await UsersService.findAll({ cartId })
+
+            if (user[0].rol === 'admin') {
+                throw new Exception('El admin no puede agregar productos al carrito', 401)
+            }
             const cart = await CartController.getById(cartId)
             // console.log("quantity", quantity)
             // const cart = await CartModel.findById(cartId);

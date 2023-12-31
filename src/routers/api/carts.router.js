@@ -5,6 +5,7 @@ import { authMiddleware, authorizationMiddleware } from "../../helpers/utils.js"
 import UsersService from "../../services/users.services.js";
 import CartsService from "../../services/carts.services.js";
 import ProductsService from "../../services/products.service.js";
+import passport from "passport";
 
 const router = Router();
 
@@ -27,7 +28,8 @@ router.get('/:cid',
 
 router.post('/:cartId',
     // authMiddleware('jwt'),
-
+    passport.authenticate('jwt', { session: false }),
+    authorizationMiddleware('user'),
     async (req, res) => {
         try {
             // console.log("req.user", req.user)

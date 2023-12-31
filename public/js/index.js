@@ -37,7 +37,7 @@
 
             // Obtiene el valor del stock desde el contenido del elemento
             let stockValue = stockElement.textContent.trim();
-
+            let data
 
             // console.log("cantidad", cantidad)
             try {
@@ -45,8 +45,7 @@
 
                 // console.log("response", response)
                 if (response.ok) {
-                    const data = await response.json();
-
+                    data = await response.json();
                     product = {
                         cartId: data.cartId,
                         _id: element.id,
@@ -66,16 +65,21 @@
             //     quantity: 1
             // }
 
-            if (cantidad <= stockValue) {
-                // console.log(cantidad + ' ' + stockValue)
-                alert("Producto agregado al carrito")
+            if (data.rol != 'admin') {
+                if (cantidad <= stockValue) {
+                    // console.log(cantidad + ' ' + stockValue)
+                    alert("Producto agregado al carrito")
+                } else {
+                    alert("Stock insuficiente - Producto agregado al carrito igualmente")
+                }
+                socket.emit('addProductToCart', product);
+                document.getElementById(`${element.id}`).value = ""
             } else {
-                alert("Stock insuficiente - Producto agregado al carrito igualmente")
+                alert('Admin no puede agregar productos al carrito')
             }
-            socket.emit('addProductToCart', product);
-            document.getElementById(`${element.id}`).value = ""
         })
     }
+
     )
     // console.log("arrayButtonAddProductToCart", arrayButtonAddProductToCart)
     // arrayButtonAddProductToCart.forEach(element => {
